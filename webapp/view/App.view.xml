@@ -1,4 +1,4 @@
-<mvc:View
+<mvc:View xmlns:layout="sap.ui.layout"
     controllerName="com.yash.demo.controller.App"
     xmlns:mvc="sap.ui.core.mvc"
     displayBlock="true"
@@ -8,7 +8,16 @@
         <App id="app">
             <pages>
                 <Page id="page" title="{i18n>title}">
-                    <content />
+                    <content>
+                        <layout:Grid id="_IDGenGrid1" >
+                            <Title id="_IDGenTitle1" text="{i18n>title}"></Title>
+                               <Text id="_IDGenText1" text="Please start the check-in process by selecting one of the options below."></Text> 
+                            <HBox id="_IDGenHBox1" >
+                               <Button id="_IDGenButton1" text="I am picking up a shipment from EXLTUBE" type="Emphasized" press="onPickPressed"></Button>
+                               <Button id="_IDGenButton2" text="I am droping off a delivery at EXTUBE" type="Emphasized" press="onDropPressed"></Button>
+                            </HBox>
+                        </layout:Grid>
+                    </content>
                 </Page>
             </pages>
         </App>
