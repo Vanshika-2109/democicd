@@ -1,0 +1,94 @@
+_schema-version: "3.2"
+ID: com-yash-demo
+description: A Fiori application.
+version: 0.0.1
+modules:
+- name: com-yash-demo-dest-content
+  type: com.sap.application.content
+  requires:
+  - name: com-yash-demo-dest-srv
+    parameters:
+      content-target: true
+  - name: com-yash-demo-repo-host
+    parameters:
+      service-key:
+        name: com-yash-demo-repo-host-key
+  - name: com-yash-demo-uaa
+    parameters:
+      service-key:
+        name: com-yash-demo-uaa-key
+  parameters:
+    content:
+      instance:
+        destinations:
+        - Name: com-yash-demo_repo_host
+          ServiceInstanceName: com-yash-demo-html5-srv
+          ServiceKeyName: com-yash-demo-repo-host-key
+          sap.cloud.service: com-yash-demo
+        - Authentication: OAuth2UserTokenExchange
+          Name: com-yash-demo_uaa
+          ServiceInstanceName: com-yash-demo-xsuaa-srv
+          ServiceKeyName: com-yash-demo-uaa-key
+          sap.cloud.service: com-yash-demo
+        existing_destinations_policy: ignore
+  build-parameters:
+    no-source: true
+- name: com-yash-demo-app-content
+  type: com.sap.application.content
+  path: .
+  requires:
+  - name: com-yash-demo-repo-host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - comyashdemo.zip
+      name: comyashdemo
+      target-path: resources/
+- name: comyashdemo
+  type: html5
+  path: .
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+resources:
+- name: com-yash-demo-dest-srv
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: true
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          existing_destinations_policy: update
+      version: 1.0.0
+    service: destination
+    service-name: com-yash-demo-dest-srv
+    service-plan: lite
+- name: com-yash-demo-uaa
+  type: org.cloudfoundry.managed-service
+  parameters:
+    path: ./xs-security.json
+    service: xsuaa
+    service-name: com-yash-demo-xsuaa-srv
+    service-plan: application
+- name: com-yash-demo-repo-host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-name: com-yash-demo-html5-srv
+    service-plan: app-host
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true
